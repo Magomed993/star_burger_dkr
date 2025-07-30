@@ -1,0 +1,41 @@
+version: '3'
+services:
+  db:
+    image: postgres:13.0-alpine
+    container_name: star_burger_db
+    volumes:
+      - db_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    ports:
+      - 5433:5432
+
+  frontend:
+    container_name: star_burger_frontend
+    build:
+      context: ./frontend
+    volumes:
+      - ./bundles:/app/bundles
+    command: ./node_modules/.bin/parcel watch bundles-src/index.js --dist-dir bundles --public-url="./"
+
+  backend:
+    container_name: star_burger_backend
+    build:
+      context: ./backend
+    volumes:
+      - ./static:/app/static
+      - ./media:/app/media
+      - ./bundles:/app/bundles
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    command: bash -c "python manage.py collectstatic --no-input && python manage.py migrate && python manage.py runserver 0.0.0.0:8080"
+    depends_on:
+      - db
+      - frontend
+
+volumes:
+  db_data:
+  media:
+  bundles:
