@@ -1,4 +1,3 @@
-version: '3'
 services:
   db:
     image: postgres:13.0-alpine
@@ -23,14 +22,14 @@ services:
     build:
       context: ./backend
     volumes:
-      - ./static:/app/static
+      - ./static:/app/staticfiles
       - ./media:/app/media
       - ./bundles:/app/bundles
     env_file:
       - .env
     ports:
-      - "8080:8080"
-    command: bash -c "python manage.py collectstatic --no-input && python manage.py migrate && python manage.py runserver 0.0.0.0:8080"
+      - "8081:8081"
+    command: bash -c "python3 manage.py collectstatic --no-input && python3 manage.py migrate && gunicorn -b 0.0.0.0:8081 --workers 3 star_burger.wsgi:application"
     depends_on:
       - db
       - frontend
