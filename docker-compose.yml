@@ -8,6 +8,7 @@ services:
       - .env
     ports:
       - 5433:5432
+    restart: unless-stopped
 
   frontend:
     container_name: star_burger_frontend
@@ -16,6 +17,7 @@ services:
     volumes:
       - ./bundles:/app/bundles
     command: ./node_modules/.bin/parcel watch bundles-src/index.js --dist-dir bundles --public-url="./"
+    restart: unless-stopped
 
   backend:
     container_name: star_burger_backend
@@ -33,6 +35,7 @@ services:
     depends_on:
       - db
       - frontend
+    restart: unless-stopped
 
 volumes:
   db_data:
